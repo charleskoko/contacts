@@ -2,15 +2,27 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Ramsey\Collection\Collection;
 
+/**
+ * Class User
+ * @package App\User
+ *
+ * @property string $id
+ * @property string $name
+ * @property string $email
+ * @property Collection $contacts
+ */
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use Uuids, HasApiTokens, HasFactory, Notifiable;
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
@@ -41,4 +53,9 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(Contact::class);
+    }
 }
