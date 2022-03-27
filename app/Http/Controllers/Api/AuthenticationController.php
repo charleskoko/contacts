@@ -24,6 +24,7 @@ class AuthenticationController extends Controller
             'password' => 'required|string|min:8'
         ]);
 
+
         if (!Auth::attempt($validatedData)) {
             return $this->error(401, '', 'credentials error');
         }
