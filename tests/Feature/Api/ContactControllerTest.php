@@ -66,17 +66,52 @@ class ContactControllerTest extends TestCase
     {
         $contact = Contact::factory()->create(['user_id' => $this->user->id]);
         Sanctum::actingAs($this->user);
-        $response = $this->delete(route('api.v1.contact_destroy',$contact->id));
+        $response = $this->delete(route('api.v1.contact_destroy', $contact->id));
         $response->assertStatus(200);
         $response->assertJsonStructure(['status', 'message', 'data']);
     }
-    public function testUserCanSeeContact(){
+
+    public function testUserCanSeeContact()
+    {
         $contact = Contact::factory()->create(['user_id' => $this->user->id]);
         Sanctum::actingAs($this->user);
-        $response = $this->get(route('api.v1.contact_destroy',$contact->id));
+        $response = $this->get(route('api.v1.contact_show', $contact->id));
         $response->assertStatus(200);
         $response->assertJsonStructure(['status', 'message', 'data']);
         $response->assertJsonCount('4', 'data');
     }
+
+    public function testUserCannotSeeContactOfOtherUser()
+    {
+        $contact = Contact::factory()->create();
+        Sanctum::actingAs($this->user);
+        $response = $this->get(route('api.v1.contact_show', $contact->id));
+        $response->assertStatus(403);
+        $response->assertJsonStructure(['status', 'message', 'data']);
+    }
+
+    public function testUserCannotUpdateContactOfOtherUser()
+    {
+        $oldData = ['email' => 'notUpdateUser@gmail.com', 'name' => 'not updated user'];
+        $contact = Contact::factory()->create($oldData);
+        $newData = [
+            'email' => 'updateUser@gmail.com',
+            'name' => 'user updated'
+        ];
+        Sanctum::actingAs($this->user);
+        $response = $this->patch(route('api.v1.contact_update', $contact->id));
+        $response->assertStatus(403);
+        $response->assertJsonStructure(['status', 'message', 'data']);
+    }
+
+    public function testUserCannotDestroyContactOfOtherUser()
+    {
+        $contact = Contact::factory()->create();
+        Sanctum::actingAs($this->user);
+        $response = $this->get(route('api.v1.contact_destroy', $contact->id));
+        $response->assertStatus(403);
+        $response->assertJsonStructure(['status', 'message', 'data']);
+    }
+
 
 }
