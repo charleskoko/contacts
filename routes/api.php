@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthenticationController;
 use App\Http\Controllers\Api\ContactController;
+use App\Http\Middleware\EnsureUserIsContactOwner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +31,11 @@ Route::group(['prefix' => 'v1'], function () {
         Route::group(['prefix' => 'contact'], function () {
             Route::get('/', [ContactController::class, 'index'])->name('contact_index');
             Route::post('/', [ContactController::class, 'store'])->name('contact_store');
-            Route::get('/{contact}', [ContactController::class, 'show'])->middleware('contactOwner')->name('contact_show');
-            Route::patch('/{contact}', [ContactController::class, 'update'])->middleware('contactOwner')->name('contact_update');
-            Route::delete('/{contact}', [ContactController::class, 'destroy'])->middleware('contactOwner')->name('contact_destroy');
+            Route::middleware([EnsureUserIsContactOwner::class])->group(function () {
+                Route::get('/{contact}', [ContactController::class, 'show'])->name('contact_show');
+                Route::patch('/{contact}', [ContactController::class, 'update'])->name('contact_update');
+                Route::delete('/{contact}', [ContactController::class, 'destroy'])->name('contact_destroy');
+            });
         });
     });
 
