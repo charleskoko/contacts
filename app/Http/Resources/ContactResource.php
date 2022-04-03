@@ -17,11 +17,11 @@ class ContactResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'first_name' => $this->id,
-            'last_name' => $this->last_name,
+            'id' => $this->id,
+            'name' => $this->name,
             'mobile' => $this->mobile,
             'email' => $this->email,
-            'address' => AddressResource::make($this->address)
+            // 'address' => AddressResource::make($this->address)
         ];
     }
 }

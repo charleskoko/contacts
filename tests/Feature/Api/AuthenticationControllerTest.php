@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\Sanctum;
 use Tests\TestCase;
 
-class AuthenticationTest extends TestCase
+class AuthenticationControllerTest extends TestCase
 {
     use DatabaseTransactions;
 

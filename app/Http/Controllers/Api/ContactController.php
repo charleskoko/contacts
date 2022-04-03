@@ -8,7 +8,6 @@ use App\Models\Contact;
 use App\Traits\ApiResponse;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 
 class ContactController extends Controller
@@ -23,7 +22,7 @@ class ContactController extends Controller
     public function index(): JsonResponse
     {
         $user = Auth::user();
-        return $this->success(ContactResource::collection($user->contacts), 'success', 200);
+        return $this->success(ContactResource::collection($user->contacts), '', 200);
     }
 
 
@@ -36,21 +35,21 @@ class ContactController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
+            'name' => 'required',
             'mobile' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'email' => 'required|email',
         ]);
-
-       $contact = Contact::create($validatedData);
-
-       return $this->success(ContactResource::make($contact),'success',201);
+        $user = Auth::user();
+        $contact = New Contact($validatedData);
+        $contact->user()->associate($user);
+        $contact->save();
+        return $this->success( ContactResource::make($contact), 'contact successfully stored', 201);
     }
 
 
     public function show(Contact $contact): JsonResponse
     {
-        return $this->success(ContactResource::make($contact),'success', 200);
+        return $this->success(ContactResource::make($contact),'', 200);
     }
 
     /**
@@ -63,25 +62,24 @@ class ContactController extends Controller
     public function update(Request $request, Contact $contact): JsonResponse
     {
         $validatedData = $request->validate([
-            'first_name' => 'required',
-            'last_name' => 'required',
+            'name' => 'required',
             'mobile' => 'nullable|regex:/^([0-9\s\-\+\(\)]*)$/|min:10',
             'email' => 'required|email',
         ]);
         $contact->update($validatedData);
-        return $this->success(ContactResource::make($contact->refresh()),'success',200);
+        return $this->success(ContactResource::make($contact->refresh()),'contact successfully updated',200);
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param Contact $contact
-     * @return Response
+     * @return JsonResponse
      */
     public function destroy(Contact $contact)
     {
         $contact->delete();
 
-        $this->success('','success',200);
+       return  $this->success('','contact successfully deleted',200);
     }
 }

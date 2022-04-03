@@ -6,7 +6,6 @@ use App\Traits\Uuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use Ramsey\Collection\Collection;
 
@@ -15,12 +14,10 @@ use Ramsey\Collection\Collection;
  * @package App\Contact
  *
  * @property string $id
- * @property string $last_name
- * @property string $first_name
+ * @property string $name
  * @property string $mobile
  * @property string $email
  * @property User $user
- * @property Collection $address
  */
 
 class Contact extends Model
@@ -35,8 +32,7 @@ class Contact extends Model
      * @var string[]
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'name',
         'mobile',
         'email',
     ];
@@ -46,8 +42,4 @@ class Contact extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function address(): HasMany
-    {
-        return $this->hasMany(Address::class);
-    }
 }
